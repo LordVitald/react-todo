@@ -1,6 +1,8 @@
 import React from 'react';
 import 'antd/dist/antd.css';
-import { Layout, Table, Tag, Popover } from 'antd';
+import { Layout, Tag, Form } from 'antd';
+import TaskTable from './Components/TaskTable';
+import TaskForm from './Components/TaskForm';
 
 const {Header, Content} = Layout;
 
@@ -63,87 +65,54 @@ function getListStatuses(){
     return listTaskStatus;
 }
 
-function buildStatus(status,date){
+class AppToDo extends React.Component{
 
-    switch (status) {
-        case TASK_STATUS_ACTIVE:
-            const dateNow = new Date();
-            const dateComplete = new Date(date.replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
-            return (dateNow > dateComplete)?
-                (
-                    getListStatuses().get(TASK_STATUS_ACTIVE).tag
-                ):(
-                    getListStatuses().get(TASK_STATUS_EXPIRED).tag
-                );
-        default:
-            return getListStatuses().get(status).tag
+    constructor(props){
+        super(props);
+        this.saveTask = this.saveTask.bind(this);
     }
 
-}
+    buildStatus(status,date) {
 
-
-function buildControls(task){
-
-}
-
-
-
-
-function AppToDo(props) {
-
-    const {Tasks} = props;
-    let arrFilters = [];
-
-    for( const item of getListStatuses().values()){
-        arrFilters.push({text:item.tag,value:item.value})
+        switch (status) {
+            case TASK_STATUS_ACTIVE:
+                const dateNow = new Date();
+                const dateComplete = new Date(date.replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
+                return (dateNow > dateComplete) ?
+                    (
+                        TASK_STATUS_ACTIVE
+                    ) : (
+                        TASK_STATUS_EXPIRED
+                    );
+            default:
+                return status
+        }
     }
-    const columns = [
-        {
-            title:'Статус',
-            dataIndex:'status',
-            filters:arrFilters,
-            width: '10%',
-            render: (status, object)=>{
-                return buildStatus(status,object.completion_date);
-            }
-        },
-        {
-            title:'Название задачи',
-            dataIndex:'title',
-            render: (title, object)=>{
-                return(
-                    <Popover
-                        title={title}
-                        content={object.description}
-                        placement={"topLeft"}
-                    >
-                        <p>{title}</p>
-                    </Popover>
-                );
-            }
-        },
-        {
-            title:'Дата',
-            dataIndex:'completion_date',
-            width: '10%'
-        },
-        {
-            title: '',
-            key: 'action',
-            width: '10%',
-            render: (item) => buildControls(item),
-        },
-    ];
 
-    return (
-        <Layout>
-            <Header style={{ position:"fixed", zIndex:1, width:'100%'}}>
-            </Header>
-            <Content style={{ padding: '0 50px', marginTop: 64 }}>
-                <Table dataSource={Tasks} columns={columns}/>
-            </Content>
-        </Layout>
-    )
+    saveTask(values){
+        console.log(values);
+    }
+
+    render(){
+        const {Tasks} = this.props;
+        const CreateForm = Form.create({name:'createForm'})(TaskForm);
+
+        return (
+            <Layout>
+                <Header style={{ position:"fixed", zIndex:1, width:'100%'}}>
+                </Header>
+
+                <Content style={{ padding: '0 50px', marginTop: 64 }}>
+                    <TaskTable
+                        Tasks={Tasks}
+                        createForm={CreateForm}
+                        saveTaskHandler={this.saveTask}
+                        listTaskStatus={getListStatuses()}
+                        handelBuildStatus={this.buildStatus}/>
+                </Content>
+            </Layout>
+        )
+    }
 }
 
 export default AppToDo;
