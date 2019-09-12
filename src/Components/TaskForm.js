@@ -19,30 +19,26 @@ class TaskForm extends React.Component{
                 if (err) {
                     return;
                 }else{
-                    handleSave(fieldsValue);
+                    handleSave(
+                        {
+                            ...fieldsValue,
+                            completion_date:fieldsValue['completion_date'].format('DD.MM.YYYY')
+                        }
+                    );
                 }
             });
         }
     }
-    componentDidMount() {
 
-        const { Task = {
+    render() {
+        const {
+            handleSave,
+            Task = {
                 title:'',
                 description:'',
                 completion_date:(new Date()).toLocaleDateString('ru-RU')
             }
         } = this.props;
-
-        this.props.form.setFieldsValue(
-            {
-                ...Task,
-                completion_date:moment( Task.completion_date ,'DD.MM.YYYY')
-            }
-        );
-    }
-
-    render() {
-        const { handleSave } = this.props;
         const { getFieldDecorator } = this.props.form;
 
         return (
@@ -51,13 +47,15 @@ class TaskForm extends React.Component{
                 <Form.Item label="Название задачи">
                     {getFieldDecorator(
                         'title', {
+                            initialValue:Task.title,
                             rules: [{ required: true, message: 'Введите название Задачи' }],
-                        })(<Input   maxLength={255}/>)}
+                        })(<Input  maxLength={255}/>)}
                 </Form.Item>
 
                 <Form.Item label={"Дата планируемого завершения"}>
                     {getFieldDecorator(
                         'completion_date', {
+                            initialValue:moment( Task.completion_date ,'DD.MM.YYYY'),
                             rules: [{ required: true, message: 'Укажите дату планируемого завершения задачи' }],
                         })(<DatePicker style={{width:'100%'}} locale={locale} format={"DD.MM.YYYY"} />)}
                 </Form.Item>
@@ -65,12 +63,13 @@ class TaskForm extends React.Component{
                 <Form.Item label="Описание задачи">
                     {getFieldDecorator(
                     'description', {
-                    rules: [{ }],
+                        initialValue:Task.description,
+                        rules: [{ }],
                     })(<Input.TextArea maxLength={512} />)}
                 </Form.Item>
 
                 <Button type="primary" htmlType="submit">
-                    Создать
+                    {Task? 'Сохранить' : 'Создать' }
                 </Button>
             </Form>
         )

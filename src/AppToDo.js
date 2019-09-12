@@ -69,7 +69,11 @@ class AppToDo extends React.Component{
 
     constructor(props){
         super(props);
+        this.state = {...props};
         this.saveTask = this.saveTask.bind(this);
+        this.completeTask = this.completeTask.bind(this);
+        this.deleteTask = this.deleteTask.bind(this);
+
     }
 
     buildStatus(status,date) {
@@ -78,7 +82,7 @@ class AppToDo extends React.Component{
             case TASK_STATUS_ACTIVE:
                 const dateNow = new Date();
                 const dateComplete = new Date(date.replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
-                return (dateNow > dateComplete) ?
+                return (dateNow < dateComplete) ?
                     (
                         TASK_STATUS_ACTIVE
                     ) : (
@@ -89,12 +93,34 @@ class AppToDo extends React.Component{
         }
     }
 
-    saveTask(values){
-        console.log(values);
+    saveTask(task, key){
+        const Tasks = [...this.props.Tasks];
+
+        if (key){
+            const Result = Tasks.map( currentTask => (currentTask.key === key)? {...currentTask,...task} : currentTask )
+            this.setState( {
+                Tasks:Result,
+                Param:1,
+            });
+        }else{
+
+        }
+
+
+    }
+
+    completeTask(task){
+        alert('Задача завершена');
+        console.log(task);
+    }
+
+    deleteTask(task){
+        alert('Задача удалена');
+        console.log(task);
     }
 
     render(){
-        const {Tasks} = this.props;
+        const {Tasks} = this.state;
         const CreateForm = Form.create({name:'createForm'})(TaskForm);
 
         return (
@@ -107,6 +133,8 @@ class AppToDo extends React.Component{
                         Tasks={Tasks}
                         createForm={CreateForm}
                         saveTaskHandler={this.saveTask}
+                        completeTaskHandler={this.completeTask}
+                        deleteTaskHandler={this.deleteTask}
                         listTaskStatus={getListStatuses()}
                         handelBuildStatus={this.buildStatus}/>
                 </Content>

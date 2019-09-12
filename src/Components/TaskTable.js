@@ -1,13 +1,15 @@
 import React from 'react'
-import {Table, Popover, Form, Button} from 'antd'
-
+import {Table, Popover, Form, Button, Icon, Popconfirm} from 'antd'
+import TaskForm from "./TaskForm";
 
 class TaskTable extends React.Component{
 
     constructor(props){
-        super(props)
+        super(props);
+        this.state = {};
         this.columns = this.columns.bind(this);
         this.buildTag4Status = this.buildTag4Status.bind(this);
+        this.buildControls4Task = this.buildControls4Task.bind(this);
     }
 
     buildTag4Status(status, completion_date){
@@ -20,9 +22,48 @@ class TaskTable extends React.Component{
         }
     }
 
-    buildControls4Status(status){
-        switch (status) {
-
+    buildControls4Task(task){
+        const {editKey} = this.state;
+        if (task.status === 'active'){
+            const {saveTaskHandler, completeTaskHandler, deleteTaskHandler} = this.props;
+            const TaskFormTask = Form.create({})(TaskForm);
+            // const FormNode = <TaskFormTask Task={task} handleSave={saveTaskHandler}/>;
+            return (
+                <div>
+                    <Popover
+                        title={task.title}
+                        content={<TaskFormTask Task={task} handleSave={ (fieldsValue, key = task.key) => {saveTaskHandler(fieldsValue, key); this.setState({editKey:undefined})}} />}
+                        placement={"leftTop"}
+                        visible={task.key===editKey}
+                    >
+                        <Icon type={"edit"} theme={"twoTone"} onClick={() => this.setState({editKey:task.key})} style={{fontSize:'24px', marginRight:'10px'}}/>
+                    </Popover>
+                    <Popconfirm
+                        title={"Задача выполнена?" }
+                        icon={<Icon type="check-circle" style={{color:'green', fontSize:'1.2em'}}/>}
+                        trigger={"click"}
+                        placement={"leftTop"}
+                        okText={'Да'}
+                        cancelText={'Нет'}
+                        onConfirm={ e => completeTaskHandler(task)}
+                    >
+                        <Icon type="check-circle" theme="twoTone"  twoToneColor={"#19eb12"} style={{fontSize:'24px', marginRight:'10px'}}/>
+                    </Popconfirm>
+                    <Popconfirm
+                        title={"Удалить задачу?" }
+                        icon={<Icon type="warning" style={{color:'red', fontSize:'1.2em'}}/>}
+                        trigger={"click"}
+                        placement={"leftTop"}
+                        okText={'Да'}
+                        cancelText={'Нет'}
+                        onConfirm={e => deleteTaskHandler(task)}
+                    >
+                        <Icon type="delete" theme="twoTone"  twoToneColor={"#eb0617"} style={{fontSize:'24px', marginRight:'10px'}}/>
+                    </Popconfirm>
+                </div>
+            )
+        } else{
+            return '';
         }
     }
 
@@ -67,7 +108,7 @@ class TaskTable extends React.Component{
             {
                 title: () => {
                     return (
-                        <Popover trigger={"click"} content={<FormCreate handleSave={saveTaskHandler}/>}>
+                        <Popover trigger={"click"} placement={"leftTop"} content={<FormCreate handleSave={saveTaskHandler}/>}>
                             <Button icon={'plus'}>
                                 Добавить задачу
                             </Button>
@@ -76,7 +117,7 @@ class TaskTable extends React.Component{
                 },
                 key: 'action',
                 width: '10%',
-                render: (item) => this.buildControls4Status(item),
+                render: (item) => this.buildControls4Task(item),
             },
         ];
     }
