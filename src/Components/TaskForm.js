@@ -33,12 +33,14 @@ class TaskForm extends React.Component{
     render() {
         const {
             handleSave,
+            handleCancel,
             Task = {
                 title:'',
                 description:'',
                 completion_date:(new Date()).toLocaleDateString('ru-RU')
             }
         } = this.props;
+
         const { getFieldDecorator } = this.props.form;
 
         return (
@@ -68,9 +70,15 @@ class TaskForm extends React.Component{
                     })(<Input.TextArea maxLength={512} />)}
                 </Form.Item>
 
-                <Button type="primary" htmlType="submit">
-                    {Task? 'Сохранить' : 'Создать' }
-                </Button>
+                <div>
+                    <Button style={{marginRight:'10px' }} type="primary" htmlType="submit">
+                        {Task? 'Сохранить' : 'Создать' }
+                    </Button>
+
+                    <Button onClick={handleCancel}>
+                        Отменить
+                    </Button>
+                </div>
             </Form>
         )
     }

@@ -78,32 +78,30 @@ class AppToDo extends React.Component{
 
     buildStatus(status,date) {
 
-        switch (status) {
-            case TASK_STATUS_ACTIVE:
-                const dateNow = new Date();
-                const dateComplete = new Date(date.replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
-                return (dateNow < dateComplete) ?
-                    (
-                        TASK_STATUS_ACTIVE
-                    ) : (
-                        TASK_STATUS_EXPIRED
-                    );
-            default:
-                return status
+        if (status === TASK_STATUS_ACTIVE) {
+
+            const dateNow = new Date();
+            const dateComplete = new Date(date.replace(/(\d+).(\d+).(\d+)/, '$3/$2/$1'));
+            return (dateNow < dateComplete) ? TASK_STATUS_ACTIVE : TASK_STATUS_EXPIRED ;
+        }else{
+            return status
         }
     }
 
     saveTask(task, key){
-        const Tasks = [...this.props.Tasks];
+        const {Tasks = []} = this.state;
 
-        if (key){
-            const Result = Tasks.map( currentTask => (currentTask.key === key)? {...currentTask,...task} : currentTask )
+        if (key !== undefined){
+            const Result = Tasks.map( currentTask => (currentTask.key === key)? {...currentTask,...task} : currentTask );
+            localStorage.setItem('Tasks', JSON.stringify(Result));
+
             this.setState( {
                 Tasks:Result,
-                Param:1,
             });
         }else{
+            if(Tasks.length){
 
+            }
         }
 
 

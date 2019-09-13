@@ -27,13 +27,18 @@ class TaskTable extends React.Component{
         if (task.status === 'active'){
             const {saveTaskHandler, completeTaskHandler, deleteTaskHandler} = this.props;
             const TaskFormTask = Form.create({})(TaskForm);
-            // const FormNode = <TaskFormTask Task={task} handleSave={saveTaskHandler}/>;
+
             return (
                 <div>
                     <Popover
                         title={task.title}
-                        content={<TaskFormTask Task={task} handleSave={ (fieldsValue, key = task.key) => {saveTaskHandler(fieldsValue, key); this.setState({editKey:undefined})}} />}
+                        content={<TaskFormTask
+                            Task={task}
+                            handleSave={ (fieldsValue, key = task.key) => {saveTaskHandler(fieldsValue, key); this.setState({editKey:undefined})}}
+                            handleCancel={() => this.setState({editKey:undefined})}
+                        />}
                         placement={"leftTop"}
+                        trigger={"click"}
                         visible={task.key===editKey}
                     >
                         <Icon type={"edit"} theme={"twoTone"} onClick={() => this.setState({editKey:task.key})} style={{fontSize:'24px', marginRight:'10px'}}/>
