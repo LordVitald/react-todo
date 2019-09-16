@@ -24,7 +24,7 @@ class TaskTable extends React.Component{
 
     buildControls4Task(task){
         const {editKey} = this.state;
-        if (task.status === 'active'){
+        if ((task.status === 'active') || ((task.status === 'expired'))){
             const {saveTaskHandler, completeTaskHandler, deleteTaskHandler} = this.props;
             const TaskFormTask = Form.create({})(TaskForm);
 
@@ -74,6 +74,7 @@ class TaskTable extends React.Component{
 
     columns(){
         const {listTaskStatus, createForm, FormCreate = createForm, saveTaskHandler} = this.props;
+        const {showCreateForm} = this.state;
         let arrFilters = [];
 
         for( const item of listTaskStatus.values()){
@@ -93,6 +94,7 @@ class TaskTable extends React.Component{
             {
                 title:'Название задачи',
                 dataIndex:'title',
+                sorter:true,
                 render: (title, object)=>{
                     return(
                         <Popover
@@ -113,8 +115,16 @@ class TaskTable extends React.Component{
             {
                 title: () => {
                     return (
-                        <Popover trigger={"click"} placement={"leftTop"} content={<FormCreate handleSave={saveTaskHandler}/>}>
-                            <Button icon={'plus'}>
+                        <Popover
+                            trigger={"click"}
+                            placement={"leftTop"}
+                            content={<FormCreate
+                                handleSave={(fieldsValue) => {saveTaskHandler(fieldsValue); this.setState({showCreateForm:false})}}
+                                handleCancel={() => this.setState({showCreateForm:false})}
+                            />}
+                            visible={showCreateForm}
+                        >
+                            <Button icon={'plus'} onClick={() => this.setState({showCreateForm:true})}>
                                 Добавить задачу
                             </Button>
                         </Popover>
@@ -129,8 +139,18 @@ class TaskTable extends React.Component{
 
     render(){
 
-        const {Tasks} = this.props;
-        return <Table dataSource={Tasks} columns={this.columns()}/>
+        const {Tasks, changeHandler} = this.props;
+        return <Table
+            dataSource={Tasks}
+            onChange={(pagination, filters, sorter, extra) => changeHandler(filters,sorter)} columns={this.columns()}
+            locale={
+                {
+                    filterConfirm: 'OK',
+                    filterReset: 'Сбросить фильтр',
+                    emptyText: 'Нет данных'
+                }
+            }
+        />
     }
 }
 
